@@ -13,7 +13,7 @@ import logo from '../../assets/logo.svg';
 interface Item {
   id: number,
   title: string,
-  image_url: string
+  image_url: string;
 }
 
 interface IBGEUFResponse {
@@ -21,13 +21,19 @@ interface IBGEUFResponse {
 }
 
 interface IBGECityResponse {
+  id: number,
   nome: string;
+}
+
+interface City {
+  id: number,
+  name: string;
 }
 
 const CreatePoint = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [ufs, setUfs] = useState<string[]>([]);
-  const [cities, setCities] = useState<string[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
 
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0]);
 
@@ -72,7 +78,12 @@ const CreatePoint = () => {
     axios
       .get<IBGECityResponse[]>(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedUf}/distritos`)
       .then(res => {
-        const cityNames = res.data.map(city => city.nome);
+        const cityNames = res.data.map<City>(city => {
+          return ({
+            name: city.nome,
+            id: city.id
+          })
+        });
 
         setCities(cityNames);
       });
@@ -223,7 +234,7 @@ const CreatePoint = () => {
               <select name="city" id="city" value={selectedCity} onChange={handleSelectCity}>
                 <option value="0">Seleciona uma cidade</option>
                 {cities.map(city => (
-                  <option key={city} value={city}>{city}</option>
+                  <option key={city.id} value={city.name}>{city.name}</option>
                 ))}
               </select>
             </div>
