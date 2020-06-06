@@ -12,8 +12,9 @@ interface Params {
 }
 
 interface Data {
-  point: {
-    image: string,
+  serializedPoint: {
+    image: string;
+    image_url: string;
     name: string;
     email: string;
     whatsapp: string;
@@ -36,6 +37,7 @@ const Detail: React.FC = () => {
 
   useEffect(() => {
     api.get(`points/${routeParams.point_id}`).then(res => {
+      console.log(res.data)
       setData(res.data);
     });
   }, []);
@@ -47,15 +49,15 @@ const Detail: React.FC = () => {
   function handleComposeMail(){
     MailComposer.composeAsync({
       subject: 'Interesse na coleta de resíduos',
-      recipients: [data.point.email],
+      recipients: [data.serializedPoint.email],
     });
   }
 
   function handleWhatsapp(){
-    Linking.openURL(`whatsapp://send?phone=${data.point.whatsapp}&text=Tenho interesse sobre coleta de resíduos`);
+    Linking.openURL(`whatsapp://send?phone=${data.serializedPoint.whatsapp}&text=Tenho interesse sobre coleta de resíduos`);
   }
 
-  if(!data.point){
+  if(!data.serializedPoint){
     return null;
   }
 
@@ -65,16 +67,17 @@ const Detail: React.FC = () => {
         <TouchableOpacity onPress={handleNavigateBack}>
           <Icon name="arrow-left" size={20} color="#34cb79"/>
         </TouchableOpacity>
-        <Image style={styles.pointImage} source={{ uri: data.point.image }}/>
+
+        <Image style={styles.pointImage} source={{ uri: data.serializedPoint.image_url }}/>
       
-        <Text style={styles.pointName}>{data.point.name}</Text>
+        <Text style={styles.pointName}>{data.serializedPoint.name}</Text>
         <Text style={styles.pointItems}>
           {data.items.map(item => item.title).join(', ')}
           </Text>
 
         <View style={styles.address}>
           <Text style={styles.addressTitle}>Endereço</Text>
-          <Text style={styles.addressContent}>{data.point.city}, {data.point.uf}</Text>
+          <Text style={styles.addressContent}>{data.serializedPoint.city}, {data.serializedPoint.uf}</Text>
         </View>
       </View>
       <View style={styles.footer}>
